@@ -1,0 +1,79 @@
+name: Build and push Helm chart
+description: Build and push Helm chart
+inputs:
+  chart_name:
+    default: ${{ github.event.repository.name }}
+  chart_dir:
+    default: "."
+  build_number:
+    required: true
+  use_kubeval:
+    default: true
+  kubeval_version:
+    default: latest
+  use_kubescore:
+    default: true
+  kubescore_version:
+    default: 1.20.0
+  push_chart:
+    default: false
+  registry_url:
+    description: Base registry URL, e.g. ghcr.io
+    required: false
+  chart_upload_url:
+    description: Chart upload URL, e.g. ghcr.io/<username>
+    required: false
+  registry_username:
+    required: false
+  registry_password:
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Helm
+      uses: azure/setup-helm@v4
+
+    - name: Lint Helm chart
+      run: helm lint ${{ inputs.chart_dir }}
+
+    - name: Render Helm templates
+      run: helm template test-release ${{ inputs.chart_dir }} --values ${{ inputs.chart_dir }}/values.yaml > ${{ inputs.chart_dir }}/rendered.yaml
+
+    - name: Install kubeval
+      if: ${{ inputs.use_kubeval == 'true' }}
+      run: |
+        curl -sSL https://github.com/instrumenta/kubeval/releases/${{ inputs.kubeval_version }}/download/kubeval-linux-amd64.tar.gz | tar xz
+        mv kubeval /usr/local/bin/kubeval
+
+    - name: Validate rendered manifests with kubeval
+      if: ${{ inputs.use_kubeval == 'true' }}
+      run: kubeval --strict ${{ inputs.chart_dir }}/rendered.yaml
+
+    - name: Install kube-score
+      if: ${{ inputs.use_kubescore == 'true' }}
+      run: |
+        curl -sSL https://github.com/zegl/kube-score/releases/download/v${{ inputs.kubescore_version }}/kube-score_${{ inputs.kubescore_version }}_linux_amd64.tar.gz | tar xz
+        mv kube-score /usr/local/bin/kube-score
+
+    - name: Check best practices with kube-score
+      if: ${{ inputs.use_kubescore == 'true' }}
+      run: kube-score score ${{ inputs.chart_dir }}/rendered.yaml
+
+    - name: Set chart version to Chart.yaml
+      run: yq -i '.version = "${{ inputs.build_number }}"' ${{ inputs.chart_dir }}/Chart.yaml -y
+
+    - name: Package Helm Chart
+      run: |
+        if [[ -z "${{ inputs.chart_dir }}" ]]; then
+          helm package ${{ inputs.chart_name }} -d ./charts
+        else
+          helm package ${{ inputs.chart_dir }}/${{ inputs.chart_name }} -d ${{ inputs.chart_dir }}/charts
+        fi
+
+    - name: Helm login
+      if: ${{ inputs.push_chart == 'true' }}
+      run: echo "${{ inputs.registry_password }}" | helm registry login ${{ inputs.registry_url }} -u ${{ inputs.registry_username }} --password-stdin
+
+    - name: Helm push
+      if: ${{ inputs.push_chart == 'true' }}
+      run: helm push ${{ inputs.chart_dir }}/charts/${{ inputs.chart_name }}-${{ inputs.build_number }}.tgz ${{ inputs.chart_upload_url }}
