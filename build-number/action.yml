@@ -1,0 +1,20 @@
+name: Build number
+description: Selects the build number depending on the parameters
+outputs:
+  build-number:
+    description: Build number
+    value: ${{ steps.build-number.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - name: Set build number to env and output
+      id: build-number
+      shell: bash
+      run: |
+        if [[ "${{ github.ref_type }}" == "tag" ]]; then
+          echo "BUILD_NUMBER=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "result=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        else
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+          echo "result=${{ github.run_number }}" >> $GITHUB_OUTPUT
+        fi
