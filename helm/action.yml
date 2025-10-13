@@ -60,7 +60,7 @@ runs:
       run: kube-score score ${{ inputs.chart_dir }}/rendered.yaml
 
     - name: Set chart version to Chart.yaml
-      run: yq -i '.version = "${{ inputs.build_number }}"' ${{ inputs.chart_dir }}/Chart.yaml -y
+      run: yq -i '.version = "${{ inputs.build_number }}"' ${{ inputs.chart_dir }}/Chart.yaml
 
     - name: Package Helm Chart
       run: |
