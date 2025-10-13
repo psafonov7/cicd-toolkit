@@ -19,12 +19,8 @@ inputs:
     default: false
   registry_url:
     description: Base registry URL, e.g. ghcr.io
-    required: false
-  chart_upload_url:
-    description: Chart upload URL, e.g. ghcr.io/<username>
-    required: false
   registry_username:
-    required: false
+    default: ${{ github.repository_owner }}
   registry_password:
     required: false
 runs:
@@ -71,4 +67,6 @@ runs:
 
     - name: Helm push
       if: ${{ inputs.push_chart == 'true' }}
-      run: helm push ${{ inputs.chart_dir }}/charts/${{ inputs.chart_name }}-${{ inputs.build_number }}.tgz ${{ inputs.chart_upload_url }}
+      run: |
+        helm push ${{ inputs.chart_dir }}/charts/${{ inputs.chart_name }}-${{ inputs.build_number }}.tgz \
+          oci://${{ inputs.registry_url }}/${{ inputs.registry_username }}/${{ github.event.repository.name }}
