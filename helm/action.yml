@@ -63,12 +63,7 @@ runs:
       run: yq -i '.version = "${{ inputs.build_number }}"' ${{ inputs.chart_dir }}/Chart.yaml
 
     - name: Package Helm Chart
-      run: |
-        if [[ -z "${{ inputs.chart_dir }}" ]]; then
-          helm package ${{ inputs.chart_name }} -d ./charts
-        else
-          helm package ${{ inputs.chart_dir }}/${{ inputs.chart_name }} -d ${{ inputs.chart_dir }}/charts
-        fi
+      run: helm package ${{ inputs.chart_dir }} -d ${{ inputs.chart_dir }}/charts
 
     - name: Helm login
       if: ${{ inputs.push_chart == 'true' }}
