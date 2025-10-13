@@ -72,4 +72,4 @@ runs:
       if: ${{ inputs.push_chart == 'true' }}
       run: |
         helm push ${{ inputs.chart_dir }}/charts/${{ inputs.chart_name }}-${{ inputs.build_number }}.tgz \
-          oci://${{ inputs.registry_url }}/${{ inputs.registry_username }}/${{ github.event.repository.name }}
+          oci://${{ inputs.registry_url }}/${{ inputs.registry_username }}
