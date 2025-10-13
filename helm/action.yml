@@ -55,6 +55,9 @@ runs:
       if: ${{ inputs.use_kubescore == 'true' }}
       run: kube-score score ${{ inputs.chart_dir }}/rendered.yaml
 
+    - name: Set chart name
+      run: yq -i '.name = "${{ inputs.chart_name }}"' ${{ inputs.chart_dir }}/Chart.yaml
+
     - name: Set chart version to Chart.yaml
       run: yq -i '.version = "${{ inputs.build_number }}"' ${{ inputs.chart_dir }}/Chart.yaml
 
