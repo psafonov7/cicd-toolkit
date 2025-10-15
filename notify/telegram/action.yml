@@ -1,0 +1,24 @@
+name: Send Telegram notification
+description: Send Telegram notification using bot API
+inputs:
+  bot_token:
+    description: Bot token
+    required: true
+  chat_id:
+    description: Chat ID
+    required: true
+  text:
+    description: Text to send
+    required: true
+  disable_notification:
+    description: Disable notification (silent delivery)
+    default: false
+runs:
+  using: "composite"
+  steps:
+    - name: Send notification
+      run: |
+        curl -X POST \
+          -H 'Content-Type: application/json' \
+          -d '{"chat_id": "${{ inputs.chat_id }}", "text": "${{ inputs.text }}", "disable_notification": ${{ inputs.disable_notification }}}' \
+          https://api.telegram.org/bot${{ inputs.bot_token }}/sendMessage

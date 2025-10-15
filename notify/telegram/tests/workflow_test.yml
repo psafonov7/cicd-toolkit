@@ -1,0 +1,13 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Call local action
+        uses: ./notify/telegram
+        with:
+          bot_token: ""
+          chat_id: ""
+          text: "Test from github actions"
