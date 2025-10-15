@@ -1,0 +1,16 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set BUILD_NUMBER
+        id: build-number
+        uses: ./build-number
+
+      - name: Print build number from env
+        run: echo $BUILD_NUMBER
+
+      - name: Print build number from output
+        run: echo ${{ steps.build-number.outputs.result }}
