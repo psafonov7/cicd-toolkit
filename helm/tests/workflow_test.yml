@@ -8,6 +8,7 @@ jobs:
       - name: Call local action
         uses: ./helm
         with:
+          chart_name: test-chart
           chart_dir: helm/tests/chart
           build_number: 0.1.0
           use_kubescore: false

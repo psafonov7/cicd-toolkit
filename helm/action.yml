@@ -2,26 +2,47 @@ name: Build and push Helm chart
 description: Build and push Helm chart
 inputs:
   chart_name:
+    description: Helm chart name to set in Chart.yaml. Defaults to the repository name.
     default: ${{ github.event.repository.name }}
   chart_dir:
-    default: "."
+    description: Path to the Helm chart directory. Defaults to ./<repository_name>.
+    default: "./${{ github.event.repository.name }}"
   build_number:
+    description: Build number to set in Chart.yaml (used as chart version suffix).
     required: true
   use_kubeval:
+    description: Whether to run kubeval validation on the rendered chart.
     default: true
   kubeval_version:
+    description: Version of kubeval to use.
     default: latest
   use_kubescore:
+    description: Whether to run kubescore analysis on the rendered chart.
     default: true
   kubescore_version:
+    description: Version of kubescore to use.
     default: 1.20.0
   push_chart:
+    description: Whether to push the built chart to a registry.
     default: false
+  registry_type:
+    description: >
+      Type of chart registry.
+      Options - 'oci' (Open Container Initiative) or 'cm' (ChartMuseum).
+      Defaults to 'oci'.
+    default: oci
   registry_url:
-    description: Base registry URL, e.g. ghcr.io
+    description: >
+      Base registry URL (without protocol, e.g., 'ghcr.io').
+      Defaults to 'ghcr.io'.
+    default: ghcr.io
+  cm_upload_url:
+    description: ChartMuseum-compatible upload URL. Required if registry_type is 'cm'
   registry_username:
+    description: Registry username used for authentication. Defaults to the repository owner.
     default: ${{ github.repository_owner }}
   registry_password:
+    description: Registry password or token used for authentication.
     required: false
 runs:
   using: "composite"
@@ -55,7 +76,7 @@ runs:
       if: ${{ inputs.use_kubescore == 'true' }}
       run: kube-score score ${{ inputs.chart_dir }}/rendered.yaml
 
-    - name: Set chart name
+    - name: Set chart name to Chart.yaml
       run: yq -i '.name = "${{ inputs.chart_name }}"' ${{ inputs.chart_dir }}/Chart.yaml
 
     - name: Set chart version to Chart.yaml
@@ -64,12 +85,32 @@ runs:
     - name: Package Helm Chart
       run: helm package ${{ inputs.chart_dir }} -d ${{ inputs.chart_dir }}/charts
 
-    - name: Helm login
-      if: ${{ inputs.push_chart == 'true' }}
+    - name: Helm login to OCI chart registry
+      if: ${{ inputs.push_chart == 'true' && inputs.registry_type == 'oci' }}
       run: echo "${{ inputs.registry_password }}" | helm registry login ${{ inputs.registry_url }} -u ${{ inputs.registry_username }} --password-stdin
 
-    - name: Helm push
-      if: ${{ inputs.push_chart == 'true' }}
+    - name: Push to OCI registry
+      if: ${{ inputs.push_chart == 'true' && inputs.registry_type == 'oci' }}
       run: |
         helm push ${{ inputs.chart_dir }}/charts/${{ inputs.chart_name }}-${{ inputs.build_number }}.tgz \
           oci://${{ inputs.registry_url }}/${{ inputs.registry_username }}
+
+    - name: Helm login to CM chart registry
+      if: ${{ inputs.push_chart == 'true' && inputs.registry_type == 'cm' }}
+      env:
+        REGISTRY_USERNAME: ${{ inputs.registry_username }}
+        REGISTRY_PASSWORD: ${{ inputs.registry_password }}
+      run: |
+        if [[ -z "${{ inputs.cm_upload_url }}" ]]; then
+          echo "cm_upload_url is required to upload the chart to ChartMuseum registry"
+          exit 1
+        fi
+        helm repo add repo ${{ inputs.cm_upload_url }} \
+          --username "${REGISTRY_USERNAME}" \
+          --password "${REGISTRY_PASSWORD}"
+
+    - name: Push to CM registry
+      if: ${{ inputs.push_chart == 'true' && inputs.registry_type == 'cm' }}
+      run: |
+        helm plugin install https://github.com/chartmuseum/helm-push.git
+        helm cm-push ${{ inputs.chart_dir }}/charts/${{ inputs.chart_name }}-${{ inputs.build_number }}.tgz repo
