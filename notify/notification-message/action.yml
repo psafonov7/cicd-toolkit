@@ -1,0 +1,31 @@
+name: Notification message
+description: Create a simple notification message
+inputs:
+  status:
+    description: Workflow status
+    required: true
+  build_number:
+    description: Build number
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Create a success title
+      if: inputs.status == 'success'
+      run: echo "NOTIFICATION_TITLE=🟢 Success" >> $GITHUB_ENV
+
+    - name: Create a failure title
+      if: inputs.status == 'failure'
+      run: echo "NOTIFICATION_TITLE=🔴 FAILURE" >> $GITHUB_ENV
+
+    - name: Set success notification message
+      if: success()
+      run: |
+        NOTIFICATION_MESSAGE=$(cat << EOF
+        $NOTIFICATION_TITLE
+        ${{ github.repository }} $BUILD_NUMBER
+        EOF
+        )
+        echo "NOTIFICATION_MESSAGE<<EOF" >> $GITHUB_ENV
+        echo "$NOTIFICATION_MESSAGE" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
