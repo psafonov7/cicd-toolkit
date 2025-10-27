@@ -1,0 +1,15 @@
+name: Get latest version
+description: Get latest version of the GitHub repo
+inputs:
+  repo:
+    description: Repo name (owner/repo-name)
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        source shared/get_latest_version.sh
+        version=$(get_latest_version ${{ inputs.repo }})
+        echo "LATEST_VERSION=$version" >> $GITHUB_ENV
+        echo "latest_version=$version" >> $GITHUB_OUTPUT
+      shell: bash
