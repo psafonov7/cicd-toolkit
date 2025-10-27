@@ -12,7 +12,7 @@ jobs:
           repo: plexsystems/sinker
 
       - name: Print build number from env
-        run: echo $LATEST_VERSION
+        run: echo "$LATEST_VERSION"
 
       - name: Print build number from output
-        run: echo ${{ steps.build-number.outputs.latest_version }}
+        run: echo "${{ steps.latest-version.outputs.latest_version }}"
