@@ -1,0 +1,19 @@
+name: Install python
+description: Install python with package manager - pip/uv
+inputs:
+  version:
+    description: Python version to install
+    default: latest
+    required: false
+  package_manager:
+    description: Package manager to use (pip/uv)
+    default: pip
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - run: ./python/setup/python_install.sh
+      shell: bash
+      env:
+        PYTHON_VERSION: ${{ inputs.version }}
+        PACKAGE_MANAGER: ${{ inputs.package_manager }}

@@ -1,0 +1,18 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set LATEST_VERSION
+        id: latest-version
+        uses: ./github/get_latest_version
+        with:
+          repo: plexsystems/sinker
+
+      - name: Print build number from env
+        run: echo "$LATEST_VERSION"
+
+      - name: Print build number from output
+        run: echo "${{ steps.latest-version.outputs.latest_version }}"
