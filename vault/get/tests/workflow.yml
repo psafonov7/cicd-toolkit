@@ -1,0 +1,18 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get secret
+        id: get-secret
+        uses: ./vault/get
+        with:
+          secret_key: ""
+          secret_path: ""
+          vault_url: ""
+          vault_token: ""
+
+      - name: Print from output
+        run: echo ${{ steps.get-secret.outputs.private }}

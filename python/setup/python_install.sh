@@ -54,7 +54,7 @@ install_with_pip() {
     local version="$1"
     local release_number
 
-    apt-get update -y > /dev/null
+    apt-get update > /dev/null
     apt-get install -y jq
 
     release_number=$(curl -s "$LATEST_RELEASE_URL" | jq -r ".tag")

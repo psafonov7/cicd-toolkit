@@ -1,0 +1,31 @@
+name: 
+description:
+inputs:
+  secret_key:
+    description: Secret key
+    required: true
+  secret_path:
+    description: Path to secret
+    required: true
+  vault_url:
+    description: Vault URL
+    required: true
+  vault_token:
+    description: Vault token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Get secret
+      run: |
+        value=$(bash ./vault/get/get_secret.sh)
+        key=${{ inputs.secret_key }}
+        echo "$key=$value" >> $GITHUB_OUTPUT
+        uppercase_key="${key^^}"
+        echo "$uppercase_key=$value" >> $GITHUB_ENV
+      shell: bash
+      env:
+        SECRET_KEY: ${{ inputs.secret_key }}
+        SECRET_PATH: ${{ inputs.secret_path }}
+        VAULT_URL: ${{ inputs.vault_url }}
+        VAULT_TOKEN: ${{ inputs.vault_token }}

@@ -1,0 +1,16 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: ./python/setup
+
+      - name: Setup Ansible
+        id: ansible-setup
+        uses: ./ansible/setup
+
+      - name: Check installation
+        run: ansible --version
