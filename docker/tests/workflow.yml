@@ -1,0 +1,14 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: docker:dind
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker build
+        uses: ./docker
+        with:
+          build_number: "1.0.0"
+          path: ./docker/tests
