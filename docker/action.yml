@@ -36,3 +36,4 @@ runs:
         REGISTRY_URL: ${{ inputs.registry_url }}
         REGISTRY_USERNAME: ${{ inputs.registry_username }}
         REGISTRY_TOKEN: ${{ inputs.registry_token }}
+      shell: bash
