@@ -26,7 +26,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: bash ./docker/docker.sh
+    - run: |
+        chmod +x ${{ github.action_path }}/docker/docker.sh
+        ${{ github.action_path }}/docker/docker.sh
+      shell: bash
       env:
         IMAGE_NAME: ${{ inputs.image_name }}
         BUILD_NUMBER: ${{ inputs.build_number }}
@@ -36,4 +39,3 @@ runs:
         REGISTRY_URL: ${{ inputs.registry_url }}
         REGISTRY_USERNAME: ${{ inputs.registry_username }}
         REGISTRY_TOKEN: ${{ inputs.registry_token }}
-      shell: bash
