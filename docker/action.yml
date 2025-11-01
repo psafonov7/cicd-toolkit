@@ -3,13 +3,13 @@ description: Build and push Docker image
 inputs:
   image_name:
     description: Image name
-    default: ${{ github.repository }}
+    default: $GITHUB_REPOSITORY
   build_number:
     description: Build number for tagging the image
     required: true
   context_path:
     description: Path to folder with Dockerfile
-    default: .
+    default: $GITHUB_WORKSPACE
   platforms:
     description: List of target platforms (e.g., linux/amd64,linux/arm64)
     default: linux/amd64
