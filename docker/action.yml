@@ -27,8 +27,8 @@ runs:
   using: composite
   steps:
     - run: |
-        chmod +x ${{ github.action_path }}/docker/docker.sh
-        ${{ github.action_path }}/docker/docker.sh
+        chmod +x ${{ github.action_path }}/docker.sh
+        ${{ github.action_path }}/docker.sh
       shell: bash
       env:
         IMAGE_NAME: ${{ inputs.image_name }}
