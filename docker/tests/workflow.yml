@@ -3,12 +3,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: docker:dind
+      image: cruizba/ubuntu-dind:latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Docker build
-        uses: ./docker
+      - uses: ./docker
         with:
           build_number: "1.0.0"
-          path: ./docker/tests
+          context_path: ./docker/tests
+          platforms: linux/amd64,linux/arm64
