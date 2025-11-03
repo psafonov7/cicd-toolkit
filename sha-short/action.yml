@@ -1,0 +1,23 @@
+name: Short SHA
+description: Get short SHA
+inputs:
+  length:
+    description: Length of the shortened SHA
+    default: 7
+outputs:
+  sha-short:
+    description: Build number
+    value: ${{ steps.sha-short.outputs.sha-short }}
+runs:
+  using: composite
+  steps:
+    - run: |
+        chmod +x $GITHUB_ACTION_PATH/sha-short.sh
+        sha=$($GITHUB_ACTION_PATH/sha-short.sh)
+        echo "SHA_SHORT=$sha" >> $GITHUB_ENV
+        echo "sha-short=$sha" >> $GITHUB_OUTPUT
+      shell: bash
+      id: sha-short
+      env:
+        SHA: ${{ github.sha }}
+        LENGTH: ${{ inputs.length }}

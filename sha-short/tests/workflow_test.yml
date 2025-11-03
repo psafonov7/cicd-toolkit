@@ -1,0 +1,13 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ./sha-short
+        id: sha-short
+      
+      - run: echo $SHA_SHORT
+
+      - run: echo ${{ steps.sha-short.outputs.sha-short }}
