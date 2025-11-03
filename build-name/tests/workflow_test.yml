@@ -1,0 +1,13 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./build-name
+        id: build-name
+
+      - run: echo $BUILD_NAME
+
+      - run: echo ${{ steps.build-name.outputs.build-name }}
