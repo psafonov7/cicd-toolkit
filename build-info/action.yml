@@ -1,0 +1,42 @@
+name: Build info
+description: Set variables with build info
+outputs:
+  build-version:
+    description: >
+      Build version without prefixes.
+      Use it in docker containers
+    value: ${{ steps.build-version.outputs.build-version }}
+  build-name:
+    description: >
+      Build name with prefixes.
+      Use it as release name
+    value: ${{ steps.build-name.outputs.build-name }}
+runs:
+  using: composite
+  steps:
+    - name: Set build version
+      id: build-version
+      shell: bash
+      run: |
+        if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+          version=${GITHUB_REF_NAME#v}
+          echo "BUILD_VERSION=$version" >> $GITHUB_ENV
+          echo "build-version=$version" >> $GITHUB_OUTPUT
+        else
+          sha=${GITHUB_SHA::7}
+          echo "BUILD_VERSION=$sha" >> $GITHUB_ENV
+          echo "build-version=$sha" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Set build name
+      id: build-name
+      shell: bash
+      run: |
+        if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+          echo "BUILD_NAME=$GITHUB_REF_NAME" >> $GITHUB_ENV
+          echo "build-name=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+        else
+          sha=${GITHUB_SHA::7}
+          echo "BUILD_NAME=$sha" >> $GITHUB_ENV
+          echo "build-name=$sha" >> $GITHUB_OUTPUT
+        fi

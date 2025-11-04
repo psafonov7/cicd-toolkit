@@ -1,0 +1,15 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ./build-info
+        id: build-info
+
+      - run: echo "Build version env - $BUILD_VERSION"
+      - run: echo "Build version context - ${{ steps.build-info.outputs.build-version }}"
+
+      - run: echo "Build name env - $BUILD_NAME"
+      - run: echo "Build name context - ${{ steps.build-info.outputs.build-name }}"
