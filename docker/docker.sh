@@ -32,7 +32,7 @@ docker buildx inspect --bootstrap
 docker buildx build \
   --platform "$PLATFORMS" \
   -t "$TAG" \
-  $( [[ "$SET_LATEST" == "true" ]] && echo "-t latest") \
+  $( [[ "$SET_LATEST" == "true" ]] && echo "-t $IMAGE_NAME:latest") \
   "$CONTEXT_PATH" \
   $( [[ "$PUSH" == "true" ]] && echo "--push" )
 
