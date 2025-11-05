@@ -13,6 +13,8 @@ REGISTRY_TOKEN="${REGISTRY_TOKEN:-}"
 TAG="${IMAGE_NAME}:${BUILD_NUMBER}"
 REMOTE_TAG="$REGISTRY_URL/$IMAGE_NAME:${BUILD_NUMBER}"
 
+SET_LATEST=$([[ "$BUILD_NUMBER" =~ ([0-9]+\.[0-9]+\.[0-9]+) ]] && echo "true" || echo "false")
+
 if [[ "$PUSH" == "true" ]]; then
   if [[ -z "$REGISTRY_URL" || -z "$REGISTRY_USERNAME" || -z "$REGISTRY_TOKEN" ]]; then
     echo "Missing registry credentials (URL, username, or token)."
@@ -30,6 +32,7 @@ docker buildx inspect --bootstrap
 docker buildx build \
   --platform "$PLATFORMS" \
   -t "$TAG" \
+  $( [[ "$SET_LATEST" == "true" ]] && echo "-t latest") \
   "$CONTEXT_PATH" \
   $( [[ "$PUSH" == "true" ]] && echo "--push" )
 
