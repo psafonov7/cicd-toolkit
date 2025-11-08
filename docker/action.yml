@@ -11,8 +11,8 @@ inputs:
     description: Path to folder with Dockerfile
     default: ${{ github.workspace }}
   platforms:
-    description: List of target platforms (e.g., linux/amd64,linux/arm64)
-    default: linux/amd64
+    description: List of target platforms
+    default: linux/amd64,linux/arm64
   push:
     description: Whether to push the image to registry
     default: 'false'
