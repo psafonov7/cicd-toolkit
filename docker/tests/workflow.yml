@@ -11,4 +11,3 @@ jobs:
         with:
           build_number: "1.0.0"
           context_path: ./docker/tests
-          platforms: linux/amd64,linux/arm64
