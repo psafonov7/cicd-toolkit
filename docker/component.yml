@@ -36,7 +36,7 @@ spec:
 
 image: cruizba/ubuntu-dind:noble-latest
 services:
-  - name: cruizba/ubuntu-dind:noble-latest
+  - name: docker:dind
     alias: docker
 
 stages:
