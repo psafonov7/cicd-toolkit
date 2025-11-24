@@ -36,13 +36,13 @@ build_args=(
 )
 
 if [[ "$SET_LATEST" == "true" ]]; then
-  args+=(-t "$IMAGE_NAME:latest")
+  build_args+=(-t "$IMAGE_NAME:latest")
 fi
 
-args+=("$CONTEXT_PATH")
+build_args+=("$CONTEXT_PATH")
 
 if [[ "$PUSH" == "true" ]]; then
-  args+=("--push")
+  build_args+=("--push")
 fi
 
 docker "${build_args[@]}"
