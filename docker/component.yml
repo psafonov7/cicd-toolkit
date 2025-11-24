@@ -34,9 +34,9 @@ spec:
 
 ---
 
-image: docker:28.4.0-dind
+image: ubuntu-dind:noble-latest
 services:
-  - name: docker:28.4.0-dind
+  - name: ubuntu-dind:noble-latest
     alias: docker
 
 stages:
