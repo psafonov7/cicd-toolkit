@@ -25,9 +25,11 @@ spec:
       type: string
     registry_username:
       description: Username for Docker registry
+      default: ""
       type: string
     registry_token:
       description: Token for Docker registry
+      default: ""
       type: string
 
 ---
