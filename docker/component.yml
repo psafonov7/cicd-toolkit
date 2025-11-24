@@ -46,7 +46,7 @@ build_push:
   stage: build_push
   script:
     - |
-      SCRIPT_PATH=$CI_PROJECT_DIR/cdcd-toolkit/docker/docker.sh
+      SCRIPT_PATH=$CI_PROJECT_DIR/cicd-toolkit/docker/docker.sh
       chmod +x $SCRIPT_PATH
       $SCRIPT_PATH
   variables:
