@@ -1,0 +1,60 @@
+spec:
+  inputs:
+    image_name:
+      description: Image name
+      default: $CI_PROJECT_PATH
+      type: string
+    build_number:
+      description: Build number for tagging the image
+      type: string
+    context_path:
+      description: Path to folder with Dockerfile
+      default: $CI_PROJECT_DIR
+      type: string
+    platforms:
+      description: List of target platforms
+      default: linux/amd64
+      type: string
+    push:
+      description: Whether to push the image to registry
+      default: false
+      type: boolean
+    registry_url:
+      description: Docker registry URL
+      default: docker.io
+      type: string
+    registry_username:
+      description: Username for Docker registry
+      default: ""
+      type: string
+    registry_token:
+      description: Token for Docker registry
+      default: ""
+      type: string
+
+---
+
+image: cruizba/ubuntu-dind:noble-latest
+services:
+  - name: docker:dind
+    alias: docker
+
+stages:
+  - build_push
+
+build_push:
+  stage: build_push
+  script:
+    - |
+      SCRIPT_PATH=$CI_PROJECT_DIR/cicd-toolkit/docker/docker.sh
+      chmod +x $SCRIPT_PATH
+      $SCRIPT_PATH
+  variables:
+    IMAGE_NAME: $[[ inputs.image_name ]]
+    BUILD_NUMBER: $[[ inputs.build_number ]]
+    CONTEXT_PATH: $[[ inputs.context_path ]]
+    PLATFORMS: $[[ inputs.platforms ]]
+    PUSH: $[[ inputs.push ]]
+    REGISTRY_URL: $[[ inputs.registry_url ]]
+    REGISTRY_USERNAME: $[[ inputs.registry_username ]]
+    REGISTRY_TOKEN: $[[ inputs.registry_token ]]

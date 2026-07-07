@@ -29,12 +29,23 @@ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 docker buildx create --name builder --use
 docker buildx inspect --bootstrap
 
-docker buildx build \
-  --platform "$PLATFORMS" \
-  -t "$TAG" \
-  $( [[ "$SET_LATEST" == "true" ]] && echo "-t $IMAGE_NAME:latest") \
-  "$CONTEXT_PATH" \
-  $( [[ "$PUSH" == "true" ]] && echo "--push" )
+build_args=(
+  buildx build
+  --platform "$PLATFORMS"
+  -t "$TAG"
+)
+
+if [[ "$SET_LATEST" == "true" ]]; then
+  build_args+=(-t "$IMAGE_NAME:latest")
+fi
+
+build_args+=("$CONTEXT_PATH")
+
+if [[ "$PUSH" == "true" ]]; then
+  build_args+=("--push")
+fi
+
+docker "${build_args[@]}"
 
 echo "Build completed successfully!"
 if [[ "$PUSH" == "true" ]]; then
