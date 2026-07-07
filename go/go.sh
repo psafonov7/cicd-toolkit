@@ -15,6 +15,7 @@ WORKDIR="${WORKDIR:-$PWD}"
 
 # Переключатели шагов (true/false)
 STEP_GOFMT="${STEP_GOFMT:-true}"
+STEP_MOD_DOWNLOAD="${STEP_MOD_DOWNLOAD:-true}"
 STEP_GOVET="${STEP_GOVET:-true}"
 STEP_GOLANGCI="${STEP_GOLANGCI:-true}"
 STEP_TEST="${STEP_TEST:-true}"
@@ -92,6 +93,11 @@ step_govet() {
     go vet ./...
 }
 
+step_mod_download() {
+    log "Step: go mod download"
+    go mod download
+}
+
 step_golangci() {
     log "Step: golangci-lint"
     command -v golangci-lint >/dev/null 2>&1 \
@@ -165,8 +171,9 @@ main() {
     log "Go version: $(go version)"
     log "Module: $(awk '/^module /{print $2; exit}' go.mod)"
 
-    maybe_run "$STEP_GOFMT"       step_gofmt
-    maybe_run "$STEP_GOVET"       step_govet
+    maybe_run "$STEP_GOFMT"        step_gofmt
+    maybe_run "$STEP_MOD_DOWNLOAD" step_mod_download
+    maybe_run "$STEP_GOVET"        step_govet
     maybe_run "$STEP_GOLANGCI"    step_golangci
     maybe_run "$STEP_TEST"        step_test
     maybe_run "$STEP_GOVULNCHECK" step_govulncheck
