@@ -15,6 +15,7 @@ WORKDIR="${WORKDIR:-$PWD}"
 
 # Переключатели шагов (true/false)
 STEP_GOFMT="${STEP_GOFMT:-true}"
+STEP_MOD_TIDY_CHECK="${STEP_MOD_TIDY_CHECK:-true}"
 STEP_MOD_DOWNLOAD="${STEP_MOD_DOWNLOAD:-true}"
 STEP_GOVET="${STEP_GOVET:-true}"
 STEP_GOLANGCI="${STEP_GOLANGCI:-true}"
@@ -91,6 +92,18 @@ step_gofmt() {
 step_govet() {
     log "Step: go vet"
     go vet ./...
+}
+
+step_mod_tidy_check() {
+    log "Step: go mod tidy check"
+    if ! command -v git >/dev/null 2>&1; then
+        error "git not found in PATH, cannot validate go.mod/go.sum"
+    fi
+    go mod tidy
+    if ! git diff --exit-code -- go.mod go.sum; then
+        echo "go.mod/go.sum out of sync. Run 'go mod tidy' locally and commit the result." >&2
+        exit 1
+    fi
 }
 
 step_mod_download() {
@@ -171,9 +184,10 @@ main() {
     log "Go version: $(go version)"
     log "Module: $(awk '/^module /{print $2; exit}' go.mod)"
 
-    maybe_run "$STEP_GOFMT"        step_gofmt
-    maybe_run "$STEP_MOD_DOWNLOAD" step_mod_download
-    maybe_run "$STEP_GOVET"        step_govet
+    maybe_run "$STEP_GOFMT"            step_gofmt
+    maybe_run "$STEP_MOD_TIDY_CHECK"   step_mod_tidy_check
+    maybe_run "$STEP_MOD_DOWNLOAD"     step_mod_download
+    maybe_run "$STEP_GOVET"            step_govet
     maybe_run "$STEP_GOLANGCI"    step_golangci
     maybe_run "$STEP_TEST"        step_test
     maybe_run "$STEP_GOVULNCHECK" step_govulncheck

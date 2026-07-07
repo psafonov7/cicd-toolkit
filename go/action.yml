@@ -7,6 +7,9 @@ inputs:
   step_gofmt:
     description: Run gofmt check
     default: 'true'
+  step_mod_tidy_check:
+    description: Fail if go.mod/go.sum are out of sync (runs go mod tidy + git diff)
+    default: 'true'
   step_mod_download:
     description: Run go mod download to fetch dependencies
     default: 'true'
@@ -77,6 +80,7 @@ runs:
       env:
         WORKDIR: ${{ inputs.workdir }}
         STEP_GOFMT: ${{ inputs.step_gofmt }}
+        STEP_MOD_TIDY_CHECK: ${{ inputs.step_mod_tidy_check }}
         STEP_MOD_DOWNLOAD: ${{ inputs.step_mod_download }}
         STEP_GOVET: ${{ inputs.step_govet }}
         STEP_GOLANGCI: ${{ inputs.step_golangci }}
