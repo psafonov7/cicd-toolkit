@@ -1,0 +1,13 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Go validate and build
+        uses: ./go
+        with:
+          workdir: go/tests/sample
+          binary_name: testapp
+          version: 0.1.0

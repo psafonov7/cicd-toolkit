@@ -1,0 +1,123 @@
+spec:
+  inputs:
+    workdir:
+      description: Working directory (Go module root)
+      default: $CI_PROJECT_DIR
+      type: string
+    step_gofmt:
+      description: Run gofmt check
+      default: "true"
+      type: string
+    step_govet:
+      description: Run go vet
+      default: "true"
+      type: string
+    step_golangci:
+      description: Run golangci-lint
+      default: "true"
+      type: string
+    step_test:
+      description: Run go test
+      default: "true"
+      type: string
+    step_govulncheck:
+      description: Run govulncheck
+      default: "true"
+      type: string
+    step_gosec:
+      description: Run gosec
+      default: "false"
+      type: string
+    step_build:
+      description: Build standalone binaries
+      default: "true"
+      type: string
+    golangci_version:
+      description: golangci-lint version (or latest)
+      default: latest
+      type: string
+    govulncheck_version:
+      description: govulncheck version (or latest)
+      default: latest
+      type: string
+    gosec_version:
+      description: gosec version (or latest)
+      default: latest
+      type: string
+    test_timeout:
+      description: go test timeout
+      default: 5m
+      type: string
+    test_race:
+      description: Enable race detector in tests (forces CGO_ENABLED=1 for tests)
+      default: "true"
+      type: string
+    coverprofile:
+      description: Coverage output file
+      default: coverage.out
+      type: string
+    go_targets:
+      description: Comma-separated GOOS/GOARCH targets for binary build
+      default: linux/amd64,linux/arm64
+      type: string
+    output_dir:
+      description: Output directory for binaries
+      default: dist
+      type: string
+    build_package:
+      description: Main package path to build
+      default: "."
+      type: string
+    version_pkg:
+      description: Import path of the package holding the version variable
+      default: main
+      type: string
+    version:
+      description: Version string injected via ldflags (defaults to BUILD_NUMBER or 'dev')
+      default: ""
+      type: string
+    binary_name:
+      description: Output binary name (defaults to module name)
+      default: ""
+      type: string
+    cgo_enabled:
+      description: CGO_ENABLED value for build
+      default: "0"
+      type: string
+
+---
+
+image: golang:1.26
+
+stages:
+  - validate_build
+
+validate_build:
+  stage: validate_build
+  script:
+    - |
+      SCRIPT_PATH=$CI_PROJECT_DIR/cicd-toolkit/go/go.sh
+      chmod +x $SCRIPT_PATH
+      $SCRIPT_PATH
+  variables:
+    WORKDIR: $[[ inputs.workdir ]]
+    STEP_GOFMT: $[[ inputs.step_gofmt ]]
+    STEP_GOVET: $[[ inputs.step_govet ]]
+    STEP_GOLANGCI: $[[ inputs.step_golangci ]]
+    STEP_TEST: $[[ inputs.step_test ]]
+    STEP_GOVULNCHECK: $[[ inputs.step_govulncheck ]]
+    STEP_GOSEC: $[[ inputs.step_gosec ]]
+    STEP_BUILD: $[[ inputs.step_build ]]
+    GOLANGCI_VERSION: $[[ inputs.golangci_version ]]
+    GOVULNCHECK_VERSION: $[[ inputs.govulncheck_version ]]
+    GOSEC_VERSION: $[[ inputs.gosec_version ]]
+    TEST_TIMEOUT: $[[ inputs.test_timeout ]]
+    TEST_RACE: $[[ inputs.test_race ]]
+    COVERPROFILE: $[[ inputs.coverprofile ]]
+    GO_TARGETS: $[[ inputs.go_targets ]]
+    OUTPUT_DIR: $[[ inputs.output_dir ]]
+    BUILD_PACKAGE: $[[ inputs.build_package ]]
+    VERSION_PKG: $[[ inputs.version_pkg ]]
+    VERSION: $[[ inputs.version ]]
+    BINARY_NAME: $[[ inputs.binary_name ]]
+    CGO_ENABLED: $[[ inputs.cgo_enabled ]]
