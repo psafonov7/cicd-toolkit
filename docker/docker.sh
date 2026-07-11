@@ -29,14 +29,22 @@ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 docker buildx create --name builder --use
 docker buildx inspect --bootstrap
 
+if [[ "$PUSH" == "true" ]]; then
+  PRIMARY_TAG="$REMOTE_TAG"
+  LATEST_TAG="$REGISTRY_URL/$IMAGE_NAME:latest"
+else
+  PRIMARY_TAG="$TAG"
+  LATEST_TAG="$IMAGE_NAME:latest"
+fi
+
 build_args=(
   buildx build
   --platform "$PLATFORMS"
-  -t "$TAG"
+  -t "$PRIMARY_TAG"
 )
 
 if [[ "$SET_LATEST" == "true" ]]; then
-  build_args+=(-t "$IMAGE_NAME:latest")
+  build_args+=(-t "$LATEST_TAG")
 fi
 
 build_args+=("$CONTEXT_PATH")
